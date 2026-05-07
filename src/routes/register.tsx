@@ -1,0 +1,55 @@
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+import { useState } from "react";
+import { TerminalSquare } from "lucide-react";
+import { useAuth } from "@/store/auth";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+
+export const Route = createFileRoute("/register")({ component: RegisterPage });
+
+function RegisterPage() {
+  const navigate = useNavigate();
+  const register = useAuth((s) => s.register);
+  const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
+  const [pw, setPw] = useState("");
+
+  return (
+    <div className="relative grid min-h-screen place-items-center overflow-hidden bg-background px-4">
+      <div className="absolute inset-0 bg-grid opacity-30" />
+      <div className="absolute inset-0" style={{ background: "var(--gradient-glow)" }} />
+      <form
+        onSubmit={(e) => { e.preventDefault(); register(name, email, pw); navigate({ to: "/dashboard" }); }}
+        className="card-gradient relative z-10 w-full max-w-sm rounded-2xl border border-border p-8 shadow-[var(--shadow-card)]"
+      >
+        <div className="mb-6 flex items-center gap-2 font-mono">
+          <div className="h-8 w-8 rounded-md bg-primary/15 grid place-items-center text-primary">
+            <TerminalSquare className="h-5 w-5" />
+          </div>
+          <span className="font-semibold text-gradient">obsrv.io</span>
+        </div>
+        <h1 className="font-mono text-xl font-semibold">Create account</h1>
+        <p className="mt-1 text-sm text-muted-foreground">Spin up your monitoring workspace.</p>
+        <div className="mt-6 space-y-4">
+          <div className="space-y-1.5">
+            <Label htmlFor="name">Name</Label>
+            <Input id="name" value={name} onChange={(e) => setName(e.target.value)} required />
+          </div>
+          <div className="space-y-1.5">
+            <Label htmlFor="email">Email</Label>
+            <Input id="email" type="email" value={email} onChange={(e) => setEmail(e.target.value)} required />
+          </div>
+          <div className="space-y-1.5">
+            <Label htmlFor="pw">Password</Label>
+            <Input id="pw" type="password" value={pw} onChange={(e) => setPw(e.target.value)} required />
+          </div>
+          <Button type="submit" className="w-full glow-primary">Create account</Button>
+        </div>
+        <p className="mt-6 text-center text-xs text-muted-foreground">
+          Already have one? <Link to="/login" className="text-primary hover:underline">Sign in</Link>
+        </p>
+      </form>
+    </div>
+  );
+}
