@@ -1,4 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { useState } from "react";
 import { Boxes, RotateCw, Square, FileText, Cpu, MemoryStick } from "lucide-react";
 import { toast } from "sonner";
 import { PageHeader } from "@/components/PageHeader";
@@ -7,13 +8,36 @@ import { MetricCard } from "@/components/MetricCard";
 import { LiveChart } from "@/components/LiveChart";
 import { mockContainers } from "@/lib/mockData";
 import { Button } from "@/components/ui/button";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 
 export const Route = createFileRoute("/docker")({ component: DockerPage });
+
+type PendingAction = { type: "restart" | "stop"; name: string } | null;
 
 function DockerPage() {
   const running = mockContainers.filter((c) => c.status === "running").length;
   const totalMem = mockContainers.reduce((a, c) => a + c.mem, 0);
   const totalCpu = mockContainers.reduce((a, c) => a + c.cpu, 0);
+
+  const [pending, setPending] = useState<PendingAction>(null);
+
+  const confirmAction = () => {
+    if (!pending) return;
+    if (pending.type === "restart") toast.success(`Restarting ${pending.name}...`);
+    else toast(`Stopped ${pending.name}`);
+    setPending(null);
+  };
+
+  const isRestart = pending?.type === "restart";
 
   return (
     <div className="p-6 max-w-[1600px] mx-auto">
@@ -58,13 +82,28 @@ function DockerPage() {
                   <td className="px-4 py-3 text-right">{c.mem} MB</td>
                   <td className="px-4 py-3 text-right">
                     <div className="flex justify-end gap-1">
-                      <Button size="icon" variant="ghost" onClick={() => toast.success(`Restarting ${c.name}...`)}>
+                      <Button
+                        size="icon"
+                        variant="ghost"
+                        aria-label={`Restart ${c.name}`}
+                        onClick={() => setPending({ type: "restart", name: c.name })}
+                      >
                         <RotateCw className="h-3.5 w-3.5" />
                       </Button>
-                      <Button size="icon" variant="ghost" onClick={() => toast(`Stopped ${c.name}`)}>
+                      <Button
+                        size="icon"
+                        variant="ghost"
+                        aria-label={`Stop ${c.name}`}
+                        onClick={() => setPending({ type: "stop", name: c.name })}
+                      >
                         <Square className="h-3.5 w-3.5" />
                       </Button>
-                      <Button size="icon" variant="ghost" onClick={() => toast(`Streaming logs for ${c.name}`)}>
+                      <Button
+                        size="icon"
+                        variant="ghost"
+                        aria-label={`View logs for ${c.name}`}
+                        onClick={() => toast(`Streaming logs for ${c.name}`)}
+                      >
                         <FileText className="h-3.5 w-3.5" />
                       </Button>
                     </div>
@@ -75,6 +114,34 @@ function DockerPage() {
           </table>
         </div>
       </div>
+
+      <AlertDialog open={pending !== null} onOpenChange={(o) => !o && setPending(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>
+              {isRestart ? "Restart container?" : "Stop container?"}
+            </AlertDialogTitle>
+            <AlertDialogDescription>
+              {isRestart
+                ? `This will restart `
+                : `This will stop `}
+              <span className="font-mono text-foreground">{pending?.name}</span>
+              {isRestart
+                ? `. In-flight requests may be dropped during the restart.`
+                : `. The container will be terminated until manually started again.`}
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={confirmAction}
+              className={!isRestart ? "bg-destructive text-destructive-foreground hover:bg-destructive/90" : undefined}
+            >
+              {isRestart ? "Restart" : "Stop"}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }
