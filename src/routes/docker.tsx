@@ -1,9 +1,10 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { Boxes, RotateCw, Square, FileText } from "lucide-react";
+import { Boxes, RotateCw, Square, FileText, Cpu, MemoryStick } from "lucide-react";
 import { toast } from "sonner";
 import { PageHeader } from "@/components/PageHeader";
 import { StatusBadge } from "@/components/StatusBadge";
 import { MetricCard } from "@/components/MetricCard";
+import { LiveChart } from "@/components/LiveChart";
 import { mockContainers } from "@/lib/mockData";
 import { Button } from "@/components/ui/button";
 
