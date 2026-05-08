@@ -1,9 +1,10 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { Boxes, RotateCw, Square, FileText } from "lucide-react";
+import { Boxes, RotateCw, Square, FileText, Cpu, MemoryStick } from "lucide-react";
 import { toast } from "sonner";
 import { PageHeader } from "@/components/PageHeader";
 import { StatusBadge } from "@/components/StatusBadge";
 import { MetricCard } from "@/components/MetricCard";
+import { LiveChart } from "@/components/LiveChart";
 import { mockContainers } from "@/lib/mockData";
 import { Button } from "@/components/ui/button";
 
@@ -20,8 +21,13 @@ function DockerPage() {
 
       <div className="grid gap-4 sm:grid-cols-3">
         <MetricCard label="Running" value={running} delta={`${mockContainers.length} total`} icon={Boxes} tone="primary" />
-        <MetricCard label="Aggregate CPU" value={totalCpu.toFixed(1)} unit="%" icon={Boxes} tone="info" />
-        <MetricCard label="Aggregate memory" value={totalMem} unit=" MB" icon={Boxes} tone="warning" />
+        <MetricCard label="Aggregate CPU" value={totalCpu.toFixed(1)} unit="%" icon={Cpu} tone="info" />
+        <MetricCard label="Aggregate memory" value={totalMem} unit=" MB" icon={MemoryStick} tone="warning" />
+      </div>
+
+      <div className="mt-6 grid gap-4 lg:grid-cols-2">
+        <LiveChart title="Fleet CPU usage" base={32} variance={9} color="var(--color-info)" />
+        <LiveChart title="Fleet memory usage" base={58} variance={6} color="var(--color-warning)" />
       </div>
 
       <div className="mt-6 card-gradient rounded-xl border border-border">
