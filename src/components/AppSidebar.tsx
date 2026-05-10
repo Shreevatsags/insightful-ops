@@ -1,4 +1,4 @@
-import { Link, useRouterState } from "@tanstack/react-router";
+import { Link, useRouterState, useNavigate } from "@tanstack/react-router";
 import { Activity, Boxes, Cloud, AlertTriangle, ScrollText, Siren, Settings, LogOut, TerminalSquare } from "lucide-react";
 import {
   Sidebar, SidebarContent, SidebarGroup, SidebarGroupContent, SidebarGroupLabel,
@@ -21,6 +21,11 @@ export function AppSidebar() {
   const collapsed = state === "collapsed";
   const path = useRouterState({ select: (r) => r.location.pathname });
   const { user, logout } = useAuth();
+  const navigate = useNavigate();
+  const handleLogout = () => {
+    logout();
+    navigate({ to: "/login" });
+  };
 
   return (
     <Sidebar collapsible="icon">
@@ -74,7 +79,7 @@ export function AppSidebar() {
               </div>
             )}
             {!collapsed && (
-              <button onClick={logout} className="text-muted-foreground hover:text-destructive" aria-label="Log out">
+              <button onClick={handleLogout} className="text-muted-foreground hover:text-destructive" aria-label="Log out">
                 <LogOut className="h-4 w-4" />
               </button>
             )}
