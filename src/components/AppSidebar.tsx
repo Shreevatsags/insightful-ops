@@ -79,7 +79,7 @@ export function AppSidebar() {
               </div>
             )}
             {!collapsed && (
-              <button onClick={logout} className="text-muted-foreground hover:text-destructive" aria-label="Log out">
+              <button onClick={handleLogout} className="text-muted-foreground hover:text-destructive" aria-label="Log out">
                 <LogOut className="h-4 w-4" />
               </button>
             )}
