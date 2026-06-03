@@ -1,7 +1,8 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { Suspense, useMemo, useRef, useState } from "react";
-import { Canvas, useFrame } from "@react-three/fiber";
+import { Canvas, useFrame, useThree } from "@react-three/fiber";
 import { OrbitControls, Stars, Html, Float, Environment } from "@react-three/drei";
+import type { OrbitControls as OrbitControlsImpl } from "three-stdlib";
 import * as THREE from "three";
 import { motion } from "framer-motion";
 import { PageHeader } from "@/components/PageHeader";
