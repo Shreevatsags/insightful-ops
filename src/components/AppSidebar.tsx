@@ -1,5 +1,5 @@
 import { Link, useRouterState, useNavigate } from "@tanstack/react-router";
-import { Activity, Boxes, Cloud, AlertTriangle, ScrollText, Siren, Settings, LogOut, TerminalSquare } from "lucide-react";
+import { Activity, Boxes, Cloud, AlertTriangle, ScrollText, Siren, Settings, LogOut, TerminalSquare, Box } from "lucide-react";
 import {
   Sidebar, SidebarContent, SidebarGroup, SidebarGroupContent, SidebarGroupLabel,
   SidebarMenu, SidebarMenuButton, SidebarMenuItem, SidebarHeader, SidebarFooter, useSidebar,
@@ -8,6 +8,7 @@ import { useAuth } from "@/store/auth";
 
 const items = [
   { title: "Dashboard", url: "/dashboard", icon: Activity },
+  { title: "3D View", url: "/dashboard-3d", icon: Box },
   { title: "Docker", url: "/docker", icon: Boxes },
   { title: "AWS / EC2", url: "/aws", icon: Cloud },
   { title: "Alerts", url: "/alerts", icon: AlertTriangle },

@@ -15,6 +15,7 @@ import { Route as LogsRouteImport } from './routes/logs'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as IncidentsRouteImport } from './routes/incidents'
 import { Route as DockerRouteImport } from './routes/docker'
+import { Route as Dashboard3dRouteImport } from './routes/dashboard-3d'
 import { Route as DashboardRouteImport } from './routes/dashboard'
 import { Route as AwsRouteImport } from './routes/aws'
 import { Route as AlertsRouteImport } from './routes/alerts'
@@ -50,6 +51,11 @@ const DockerRoute = DockerRouteImport.update({
   path: '/docker',
   getParentRoute: () => rootRouteImport,
 } as any)
+const Dashboard3dRoute = Dashboard3dRouteImport.update({
+  id: '/dashboard-3d',
+  path: '/dashboard-3d',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const DashboardRoute = DashboardRouteImport.update({
   id: '/dashboard',
   path: '/dashboard',
@@ -76,6 +82,7 @@ export interface FileRoutesByFullPath {
   '/alerts': typeof AlertsRoute
   '/aws': typeof AwsRoute
   '/dashboard': typeof DashboardRoute
+  '/dashboard-3d': typeof Dashboard3dRoute
   '/docker': typeof DockerRoute
   '/incidents': typeof IncidentsRoute
   '/login': typeof LoginRoute
@@ -88,6 +95,7 @@ export interface FileRoutesByTo {
   '/alerts': typeof AlertsRoute
   '/aws': typeof AwsRoute
   '/dashboard': typeof DashboardRoute
+  '/dashboard-3d': typeof Dashboard3dRoute
   '/docker': typeof DockerRoute
   '/incidents': typeof IncidentsRoute
   '/login': typeof LoginRoute
@@ -101,6 +109,7 @@ export interface FileRoutesById {
   '/alerts': typeof AlertsRoute
   '/aws': typeof AwsRoute
   '/dashboard': typeof DashboardRoute
+  '/dashboard-3d': typeof Dashboard3dRoute
   '/docker': typeof DockerRoute
   '/incidents': typeof IncidentsRoute
   '/login': typeof LoginRoute
@@ -115,6 +124,7 @@ export interface FileRouteTypes {
     | '/alerts'
     | '/aws'
     | '/dashboard'
+    | '/dashboard-3d'
     | '/docker'
     | '/incidents'
     | '/login'
@@ -127,6 +137,7 @@ export interface FileRouteTypes {
     | '/alerts'
     | '/aws'
     | '/dashboard'
+    | '/dashboard-3d'
     | '/docker'
     | '/incidents'
     | '/login'
@@ -139,6 +150,7 @@ export interface FileRouteTypes {
     | '/alerts'
     | '/aws'
     | '/dashboard'
+    | '/dashboard-3d'
     | '/docker'
     | '/incidents'
     | '/login'
@@ -152,6 +164,7 @@ export interface RootRouteChildren {
   AlertsRoute: typeof AlertsRoute
   AwsRoute: typeof AwsRoute
   DashboardRoute: typeof DashboardRoute
+  Dashboard3dRoute: typeof Dashboard3dRoute
   DockerRoute: typeof DockerRoute
   IncidentsRoute: typeof IncidentsRoute
   LoginRoute: typeof LoginRoute
@@ -204,6 +217,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DockerRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/dashboard-3d': {
+      id: '/dashboard-3d'
+      path: '/dashboard-3d'
+      fullPath: '/dashboard-3d'
+      preLoaderRoute: typeof Dashboard3dRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/dashboard': {
       id: '/dashboard'
       path: '/dashboard'
@@ -240,6 +260,7 @@ const rootRouteChildren: RootRouteChildren = {
   AlertsRoute: AlertsRoute,
   AwsRoute: AwsRoute,
   DashboardRoute: DashboardRoute,
+  Dashboard3dRoute: Dashboard3dRoute,
   DockerRoute: DockerRoute,
   IncidentsRoute: IncidentsRoute,
   LoginRoute: LoginRoute,
@@ -250,3 +271,13 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}
