@@ -364,7 +364,7 @@ function Dashboard3D() {
             onPointerMissed={() => setSelectedId(null)}
           >
             <Suspense fallback={null}>
-              <Scene nodes={baseNodes} selectedId={selectedId} onSelect={(n) => setSelectedId(n.id)} />
+              <Scene nodes={baseNodes} selectedId={selectedId} selectedNode={selected} controlsRef={controlsRef} onSelect={(n) => setSelectedId(n.id)} />
             </Suspense>
           </Canvas>
 
