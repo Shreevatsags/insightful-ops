@@ -99,25 +99,137 @@ function ServerNode({ node, onSelect, selected }: { node: Node; onSelect: (n: No
   );
 }
 
-function Grid() {
+function WaveGrid() {
+  const ref = useRef<THREE.Mesh>(null!);
+  useFrame((s) => {
+    const geom = ref.current.geometry as THREE.PlaneGeometry;
+    const pos = geom.attributes.position as THREE.BufferAttribute;
+    const t = s.clock.elapsedTime;
+    for (let i = 0; i < pos.count; i++) {
+      const x = pos.getX(i);
+      const y = pos.getY(i);
+      const z = Math.sin(x * 0.4 + t) * 0.15 + Math.cos(y * 0.4 + t * 0.8) * 0.15;
+      pos.setZ(i, z);
+    }
+    pos.needsUpdate = true;
+  });
   return (
-    <gridHelper
-      args={[40, 40, "#1e293b", "#0f172a"]}
-      position={[0, -0.01, 0]}
-    />
+    <mesh ref={ref} rotation={[-Math.PI / 2, 0, 0]} position={[0, -0.5, 0]}>
+      <planeGeometry args={[40, 40, 40, 40]} />
+      <meshBasicMaterial color="#1e293b" wireframe transparent opacity={0.5} />
+    </mesh>
   );
 }
 
+function PulseRing({ position, color, delay = 0 }: { position: [number, number, number]; color: string; delay?: number }) {
+  const ref = useRef<THREE.Mesh>(null!);
+  const mat = useRef<THREE.MeshBasicMaterial>(null!);
+  useFrame((s) => {
+    const t = (s.clock.elapsedTime + delay) % 2.5;
+    const k = t / 2.5;
+    const scale = 0.5 + k * 4;
+    ref.current.scale.set(scale, scale, scale);
+    mat.current.opacity = (1 - k) * 0.6;
+  });
+  return (
+    <mesh ref={ref} position={position} rotation={[-Math.PI / 2, 0, 0]}>
+      <ringGeometry args={[0.4, 0.5, 48]} />
+      <meshBasicMaterial ref={mat} color={color} transparent side={THREE.DoubleSide} />
+    </mesh>
+  );
+}
+
+function DataPacket({ from, to, speed = 1, color = "#4ade80" }: { from: [number, number, number]; to: [number, number, number]; speed?: number; color?: string }) {
+  const ref = useRef<THREE.Mesh>(null!);
+  const offset = useRef(Math.random());
+  useFrame((s) => {
+    const k = ((s.clock.elapsedTime * speed * 0.4 + offset.current) % 1);
+    // quadratic bezier arc with elevated control point
+    const cx = (from[0] + to[0]) / 2;
+    const cz = (from[2] + to[2]) / 2;
+    const arcH = 3 + Math.hypot(to[0] - from[0], to[2] - from[2]) * 0.2;
+    const x = (1 - k) * (1 - k) * from[0] + 2 * (1 - k) * k * cx + k * k * to[0];
+    const y = (1 - k) * (1 - k) * from[1] + 2 * (1 - k) * k * arcH + k * k * to[1];
+    const z = (1 - k) * (1 - k) * from[2] + 2 * (1 - k) * k * cz + k * k * to[2];
+    ref.current.position.set(x, y, z);
+  });
+  return (
+    <mesh ref={ref}>
+      <sphereGeometry args={[0.12, 12, 12]} />
+      <meshBasicMaterial color={color} />
+    </mesh>
+  );
+}
+
+function CoreOrb() {
+  const groupRef = useRef<THREE.Group>(null!);
+  const innerRef = useRef<THREE.Mesh>(null!);
+  useFrame((s) => {
+    const t = s.clock.elapsedTime;
+    groupRef.current.rotation.y = t * 0.3;
+    groupRef.current.rotation.x = Math.sin(t * 0.4) * 0.2;
+    if (innerRef.current) {
+      const pulse = 1 + Math.sin(t * 2) * 0.08;
+      innerRef.current.scale.setScalar(pulse);
+    }
+  });
+  return (
+    <group ref={groupRef} position={[0, 1.2, 0]}>
+      <mesh ref={innerRef}>
+        <icosahedronGeometry args={[0.7, 1]} />
+        <meshStandardMaterial color="#4ade80" emissive="#4ade80" emissiveIntensity={1.5} wireframe />
+      </mesh>
+      <mesh>
+        <sphereGeometry args={[0.35, 24, 24]} />
+        <meshBasicMaterial color="#a7f3d0" transparent opacity={0.6} />
+      </mesh>
+    </group>
+  );
+}
+
+function Grid() {
+  return <gridHelper args={[40, 40, "#1e293b", "#0f172a"]} position={[0, -0.01, 0]} />;
+}
+
 function Scene({ nodes, selectedId, onSelect }: { nodes: Node[]; selectedId: string | null; onSelect: (n: Node) => void }) {
+  const packets = useMemo(() => {
+    const arr: { from: [number, number, number]; to: [number, number, number]; color: string; speed: number }[] = [];
+    for (let i = 0; i < 14; i++) {
+      const a = nodes[Math.floor(Math.random() * nodes.length)];
+      let b = nodes[Math.floor(Math.random() * nodes.length)];
+      if (!a || !b || a.id === b.id) continue;
+      arr.push({
+        from: a.position,
+        to: b.position,
+        color: STATUS_COLOR[a.status] ?? "#4ade80",
+        speed: 0.6 + Math.random() * 1.4,
+      });
+    }
+    return arr;
+  }, [nodes]);
+
   return (
     <>
       <color attach="background" args={["#0a0f1c"]} />
       <fog attach="fog" args={["#0a0f1c", 18, 48]} />
       <ambientLight intensity={0.35} />
       <directionalLight position={[8, 12, 6]} intensity={0.6} castShadow />
-      <pointLight position={[0, 8, 0]} intensity={0.6} color="#4ade80" />
+      <pointLight position={[0, 8, 0]} intensity={0.8} color="#4ade80" />
       <Stars radius={80} depth={40} count={2000} factor={3} fade speed={1} />
       <Grid />
+      <WaveGrid />
+      <CoreOrb />
+      {nodes.map((n, i) => (
+        <PulseRing
+          key={`p-${n.id}`}
+          position={[n.position[0], 0, n.position[2]]}
+          color={STATUS_COLOR[n.status] ?? "#64748b"}
+          delay={i * 0.18}
+        />
+      ))}
+      {packets.map((p, i) => (
+        <DataPacket key={i} from={p.from} to={p.to} color={p.color} speed={p.speed} />
+      ))}
       {nodes.map((n) => (
         <ServerNode key={n.id} node={n} onSelect={onSelect} selected={selectedId === n.id} />
       ))}
@@ -128,7 +240,7 @@ function Scene({ nodes, selectedId, onSelect }: { nodes: Node[]; selectedId: str
         maxDistance={28}
         maxPolarAngle={Math.PI / 2.05}
         autoRotate
-        autoRotateSpeed={0.4}
+        autoRotateSpeed={0.5}
       />
     </>
   );
