@@ -14,7 +14,60 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      prometheus_queries: {
+        Row: {
+          created_at: string
+          enabled: boolean
+          id: string
+          name: string
+          query: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          enabled?: boolean
+          id?: string
+          name: string
+          query: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          enabled?: boolean
+          id?: string
+          name?: string
+          query?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      prometheus_samples: {
+        Row: {
+          id: number
+          labels: Json
+          metric: string | null
+          query_name: string
+          scraped_at: string
+          value: number
+        }
+        Insert: {
+          id?: number
+          labels?: Json
+          metric?: string | null
+          query_name: string
+          scraped_at?: string
+          value: number
+        }
+        Update: {
+          id?: number
+          labels?: Json
+          metric?: string | null
+          query_name?: string
+          scraped_at?: string
+          value?: number
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
