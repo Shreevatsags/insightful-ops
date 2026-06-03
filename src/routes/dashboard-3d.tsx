@@ -329,6 +329,7 @@ function Dashboard3D() {
 
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const selected = baseNodes.find((n) => n.id === selectedId) ?? null;
+  const controlsRef = useRef<OrbitControlsImpl | null>(null);
 
   const counts = baseNodes.reduce(
     (acc, n) => {
