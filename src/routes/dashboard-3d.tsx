@@ -192,7 +192,62 @@ function Grid() {
   return <gridHelper args={[40, 40, "#1e293b", "#0f172a"]} position={[0, -0.01, 0]} />;
 }
 
-function Scene({ nodes, selectedId, onSelect }: { nodes: Node[]; selectedId: string | null; onSelect: (n: Node) => void }) {
+function CameraRig({
+  target,
+  controlsRef,
+}: {
+  target: Node | null;
+  controlsRef: React.MutableRefObject<OrbitControlsImpl | null>;
+}) {
+  const { camera } = useThree();
+  const desiredPos = useRef(new THREE.Vector3(10, 8, 14));
+  const desiredTarget = useRef(new THREE.Vector3(0, 1, 0));
+
+  // Recompute desired pose when selection changes
+  const lastId = useRef<string | null>(null);
+  if ((target?.id ?? null) !== lastId.current) {
+    lastId.current = target?.id ?? null;
+    if (target) {
+      const [x, y, z] = target.position;
+      const tgt = new THREE.Vector3(x, y + 0.6, z);
+      // place camera offset from origin through the node, pulled back
+      const dir = new THREE.Vector3(x, 0, z).normalize();
+      if (dir.lengthSq() === 0) dir.set(1, 0, 0);
+      const offset = dir.multiplyScalar(4.5);
+      desiredPos.current.set(x + offset.x, y + 3.2, z + offset.z);
+      desiredTarget.current.copy(tgt);
+    } else {
+      desiredPos.current.set(10, 8, 14);
+      desiredTarget.current.set(0, 1, 0);
+    }
+  }
+
+  useFrame((_, delta) => {
+    const k = 1 - Math.pow(0.001, delta); // framerate-independent smoothing
+    camera.position.lerp(desiredPos.current, k);
+    const c = controlsRef.current;
+    if (c) {
+      c.target.lerp(desiredTarget.current, k);
+      c.update();
+    }
+  });
+
+  return null;
+}
+
+function Scene({
+  nodes,
+  selectedId,
+  onSelect,
+  controlsRef,
+  selectedNode,
+}: {
+  nodes: Node[];
+  selectedId: string | null;
+  onSelect: (n: Node) => void;
+  controlsRef: React.MutableRefObject<OrbitControlsImpl | null>;
+  selectedNode: Node | null;
+}) {
   const packets = useMemo(() => {
     const arr: { from: [number, number, number]; to: [number, number, number]; color: string; speed: number }[] = [];
     for (let i = 0; i < 14; i++) {
@@ -235,13 +290,17 @@ function Scene({ nodes, selectedId, onSelect }: { nodes: Node[]; selectedId: str
         <ServerNode key={n.id} node={n} onSelect={onSelect} selected={selectedId === n.id} />
       ))}
       <Environment preset="night" />
+      <CameraRig target={selectedNode} controlsRef={controlsRef} />
       <OrbitControls
+        ref={controlsRef}
         enablePan={false}
-        minDistance={8}
+        minDistance={6}
         maxDistance={28}
         maxPolarAngle={Math.PI / 2.05}
-        autoRotate
+        autoRotate={!selectedNode}
         autoRotateSpeed={0.5}
+        enableDamping
+        dampingFactor={0.08}
       />
     </>
   );
