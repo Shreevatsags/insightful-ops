@@ -7,6 +7,14 @@ import * as THREE from "three";
 import { motion } from "framer-motion";
 import { PageHeader } from "@/components/PageHeader";
 import { mockServers } from "@/lib/mockData";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Slider } from "@/components/ui/slider";
 
 export const Route = createFileRoute("/dashboard-3d")({ component: Dashboard3D });
 
@@ -24,6 +32,15 @@ const STATUS_COLOR: Record<string, string> = {
   degraded: "#facc15",
   offline: "#ef4444",
 };
+
+const EASINGS = {
+  linear: (t: number) => t,
+  easeIn: (t: number) => t * t * t,
+  easeOut: (t: number) => 1 - Math.pow(1 - t, 3),
+  easeInOut: (t: number) => (t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2),
+};
+
+type EasingName = keyof typeof EASINGS;
 
 function ServerNode({ node, onSelect, selected }: { node: Node; onSelect: (n: Node) => void; selected: boolean }) {
   const ref = useRef<THREE.Mesh>(null!);
@@ -195,41 +212,62 @@ function Grid() {
 function CameraRig({
   target,
   controlsRef,
+  duration,
+  easing,
 }: {
   target: Node | null;
   controlsRef: React.MutableRefObject<OrbitControlsImpl | null>;
+  duration: number;
+  easing: EasingName;
 }) {
-  const { camera } = useThree();
-  const desiredPos = useRef(new THREE.Vector3(10, 8, 14));
-  const desiredTarget = useRef(new THREE.Vector3(0, 1, 0));
-
-  // Recompute desired pose when selection changes
+  const { camera, clock } = useThree();
+  const tween = useRef<{
+    startTime: number;
+    fromPos: THREE.Vector3;
+    fromTarget: THREE.Vector3;
+    toPos: THREE.Vector3;
+    toTarget: THREE.Vector3;
+  } | null>(null);
   const lastId = useRef<string | null>(null);
+
   if ((target?.id ?? null) !== lastId.current) {
     lastId.current = target?.id ?? null;
+    const now = clock.elapsedTime;
+    const fromPos = camera.position.clone();
+    const fromTarget = controlsRef.current?.target.clone() ?? new THREE.Vector3(0, 1, 0);
+
+    let toPos: THREE.Vector3;
+    let toTarget: THREE.Vector3;
+
     if (target) {
       const [x, y, z] = target.position;
-      const tgt = new THREE.Vector3(x, y + 0.6, z);
-      // place camera offset from origin through the node, pulled back
+      toTarget = new THREE.Vector3(x, y + 0.6, z);
       const dir = new THREE.Vector3(x, 0, z).normalize();
       if (dir.lengthSq() === 0) dir.set(1, 0, 0);
       const offset = dir.multiplyScalar(4.5);
-      desiredPos.current.set(x + offset.x, y + 3.2, z + offset.z);
-      desiredTarget.current.copy(tgt);
+      toPos = new THREE.Vector3(x + offset.x, y + 3.2, z + offset.z);
     } else {
-      desiredPos.current.set(10, 8, 14);
-      desiredTarget.current.set(0, 1, 0);
+      toPos = new THREE.Vector3(10, 8, 14);
+      toTarget = new THREE.Vector3(0, 1, 0);
     }
+
+    tween.current = { startTime: now, fromPos, fromTarget, toPos, toTarget };
   }
 
-  useFrame((_, delta) => {
-    const k = 1 - Math.pow(0.001, delta); // framerate-independent smoothing
-    camera.position.lerp(desiredPos.current, k);
+  useFrame(() => {
+    if (!tween.current) return;
+    const elapsed = clock.elapsedTime - tween.current.startTime;
+    const rawT = Math.min(elapsed / duration, 1);
+    const easedT = EASINGS[easing](rawT);
+
+    camera.position.lerpVectors(tween.current.fromPos, tween.current.toPos, easedT);
     const c = controlsRef.current;
     if (c) {
-      c.target.lerp(desiredTarget.current, k);
+      c.target.lerpVectors(tween.current.fromTarget, tween.current.toTarget, easedT);
       c.update();
     }
+
+    if (rawT >= 1) tween.current = null;
   });
 
   return null;
@@ -241,12 +279,16 @@ function Scene({
   onSelect,
   controlsRef,
   selectedNode,
+  duration,
+  easing,
 }: {
   nodes: Node[];
   selectedId: string | null;
   onSelect: (n: Node) => void;
   controlsRef: React.MutableRefObject<OrbitControlsImpl | null>;
   selectedNode: Node | null;
+  duration: number;
+  easing: EasingName;
 }) {
   const packets = useMemo(() => {
     const arr: { from: [number, number, number]; to: [number, number, number]; color: string; speed: number }[] = [];
@@ -290,7 +332,7 @@ function Scene({
         <ServerNode key={n.id} node={n} onSelect={onSelect} selected={selectedId === n.id} />
       ))}
       <Environment preset="night" />
-      <CameraRig target={selectedNode} controlsRef={controlsRef} />
+      <CameraRig target={selectedNode} controlsRef={controlsRef} duration={duration} easing={easing} />
       <OrbitControls
         ref={controlsRef}
         enablePan={false}
@@ -331,6 +373,9 @@ function Dashboard3D() {
   const selected = baseNodes.find((n) => n.id === selectedId) ?? null;
   const controlsRef = useRef<OrbitControlsImpl | null>(null);
 
+  const [tweenDuration, setTweenDuration] = useState<number>(1.2);
+  const [tweenEasing, setTweenEasing] = useState<EasingName>("easeOut");
+
   const counts = baseNodes.reduce(
     (acc, n) => {
       acc.total += 1;
@@ -364,7 +409,15 @@ function Dashboard3D() {
             onPointerMissed={() => setSelectedId(null)}
           >
             <Suspense fallback={null}>
-              <Scene nodes={baseNodes} selectedId={selectedId} selectedNode={selected} controlsRef={controlsRef} onSelect={(n) => setSelectedId(n.id)} />
+              <Scene
+                nodes={baseNodes}
+                selectedId={selectedId}
+                selectedNode={selected}
+                controlsRef={controlsRef}
+                duration={tweenDuration}
+                easing={tweenEasing}
+                onSelect={(n) => setSelectedId(n.id)}
+              />
             </Suspense>
           </Canvas>
 
@@ -436,6 +489,39 @@ function Dashboard3D() {
           )}
 
           <div className="mt-auto border-t border-border pt-4">
+            <p className="font-mono text-[10px] uppercase tracking-wider text-muted-foreground">Camera Tween</p>
+            <div className="mt-3 space-y-3">
+              <div>
+                <div className="mb-1 flex items-center justify-between">
+                  <span className="text-xs text-muted-foreground">Duration</span>
+                  <span className="font-mono text-xs text-foreground">{tweenDuration.toFixed(1)}s</span>
+                </div>
+                <Slider
+                  value={[tweenDuration]}
+                  onValueChange={(v) => setTweenDuration(v[0])}
+                  min={0.2}
+                  max={3.0}
+                  step={0.1}
+                />
+              </div>
+              <div>
+                <span className="text-xs text-muted-foreground">Easing</span>
+                <Select value={tweenEasing} onValueChange={(v) => setTweenEasing(v as EasingName)}>
+                  <SelectTrigger className="mt-1 h-8 text-xs">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="linear">linear</SelectItem>
+                    <SelectItem value="easeIn">ease-in</SelectItem>
+                    <SelectItem value="easeOut">ease-out</SelectItem>
+                    <SelectItem value="easeInOut">ease-in-out</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+          </div>
+
+          <div className="mt-4 border-t border-border pt-4">
             <p className="font-mono text-[10px] uppercase tracking-wider text-muted-foreground">Legend</p>
             <div className="mt-2 space-y-1 text-xs">
               <p><span style={{ color: STATUS_COLOR.online }}>■</span> online</p>
