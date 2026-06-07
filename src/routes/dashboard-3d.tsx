@@ -442,7 +442,7 @@ function Dashboard3D() {
           </div>
 
           <div className="pointer-events-none absolute bottom-3 right-4 font-mono text-[10px] text-muted-foreground">
-            drag to orbit · scroll to zoom
+            drag · scroll · click a node
           </div>
         </motion.div>
 
