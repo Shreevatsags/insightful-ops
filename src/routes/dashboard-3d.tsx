@@ -173,8 +173,8 @@ function DataPacket({ from, to, speed = 1, color = "#4ade80" }: { from: [number,
   });
   return (
     <mesh ref={ref}>
-      <sphereGeometry args={[0.12, 12, 12]} />
-      <meshBasicMaterial color={color} />
+      <sphereGeometry args={[0.15, 16, 16]} />
+      <meshBasicMaterial color={color} toneMapped={false} />
     </mesh>
   );
 }
