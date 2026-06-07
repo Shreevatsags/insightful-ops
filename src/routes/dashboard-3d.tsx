@@ -309,12 +309,12 @@ function Scene({
 
   return (
     <>
-      <color attach="background" args={["#0a0f1c"]} />
-      <fog attach="fog" args={["#0a0f1c", 18, 48]} />
-      <ambientLight intensity={0.35} />
-      <directionalLight position={[8, 12, 6]} intensity={0.6} castShadow />
-      <pointLight position={[0, 8, 0]} intensity={0.8} color="#4ade80" />
-      <Stars radius={80} depth={40} count={2000} factor={3} fade speed={1} />
+      <color attach="background" args={["#070b15"]} />
+      <fog attach="fog" args={["#070b15", 22, 55]} />
+      <ambientLight intensity={0.4} />
+      <directionalLight position={[8, 12, 6]} intensity={0.7} castShadow />
+      <pointLight position={[0, 8, 0]} intensity={1.1} color="#4ade80" />
+      <Stars radius={90} depth={50} count={3500} factor={3.5} fade speed={1.2} />
       <Grid />
       <WaveGrid />
       <CoreOrb />
@@ -337,11 +337,11 @@ function Scene({
       <OrbitControls
         ref={controlsRef}
         enablePan={false}
-        minDistance={6}
-        maxDistance={28}
+        minDistance={5}
+        maxDistance={32}
         maxPolarAngle={Math.PI / 2.05}
         autoRotate={!selectedNode}
-        autoRotateSpeed={0.5}
+        autoRotateSpeed={0.65}
         enableDamping
         dampingFactor={0.08}
       />
