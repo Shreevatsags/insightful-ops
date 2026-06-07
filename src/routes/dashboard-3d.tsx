@@ -293,7 +293,7 @@ function Scene({
 }) {
   const packets = useMemo(() => {
     const arr: { from: [number, number, number]; to: [number, number, number]; color: string; speed: number }[] = [];
-    for (let i = 0; i < 14; i++) {
+    for (let i = 0; i < 22; i++) {
       const a = nodes[Math.floor(Math.random() * nodes.length)];
       let b = nodes[Math.floor(Math.random() * nodes.length)];
       if (!a || !b || a.id === b.id) continue;
