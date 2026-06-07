@@ -134,7 +134,7 @@ function WaveGrid() {
   return (
     <mesh ref={ref} rotation={[-Math.PI / 2, 0, 0]} position={[0, -0.5, 0]}>
       <planeGeometry args={[40, 40, 40, 40]} />
-      <meshBasicMaterial color="#1e293b" wireframe transparent opacity={0.5} />
+      <meshBasicMaterial color="#2a3a5c" wireframe transparent opacity={0.55} />
     </mesh>
   );
 }
@@ -173,8 +173,8 @@ function DataPacket({ from, to, speed = 1, color = "#4ade80" }: { from: [number,
   });
   return (
     <mesh ref={ref}>
-      <sphereGeometry args={[0.12, 12, 12]} />
-      <meshBasicMaterial color={color} />
+      <sphereGeometry args={[0.15, 16, 16]} />
+      <meshBasicMaterial color={color} toneMapped={false} />
     </mesh>
   );
 }
@@ -184,10 +184,11 @@ function CoreOrb() {
   const innerRef = useRef<THREE.Mesh>(null!);
   useFrame((s) => {
     const t = s.clock.elapsedTime;
-    groupRef.current.rotation.y = t * 0.3;
+    groupRef.current.rotation.y = t * 0.35;
     groupRef.current.rotation.x = Math.sin(t * 0.4) * 0.2;
+    groupRef.current.position.y = 1.2 + Math.sin(t * 1.2) * 0.15;
     if (innerRef.current) {
-      const pulse = 1 + Math.sin(t * 2) * 0.08;
+      const pulse = 1 + Math.sin(t * 2) * 0.1;
       innerRef.current.scale.setScalar(pulse);
     }
   });
@@ -292,7 +293,7 @@ function Scene({
 }) {
   const packets = useMemo(() => {
     const arr: { from: [number, number, number]; to: [number, number, number]; color: string; speed: number }[] = [];
-    for (let i = 0; i < 14; i++) {
+    for (let i = 0; i < 22; i++) {
       const a = nodes[Math.floor(Math.random() * nodes.length)];
       let b = nodes[Math.floor(Math.random() * nodes.length)];
       if (!a || !b || a.id === b.id) continue;
@@ -308,12 +309,12 @@ function Scene({
 
   return (
     <>
-      <color attach="background" args={["#0a0f1c"]} />
-      <fog attach="fog" args={["#0a0f1c", 18, 48]} />
-      <ambientLight intensity={0.35} />
-      <directionalLight position={[8, 12, 6]} intensity={0.6} castShadow />
-      <pointLight position={[0, 8, 0]} intensity={0.8} color="#4ade80" />
-      <Stars radius={80} depth={40} count={2000} factor={3} fade speed={1} />
+      <color attach="background" args={["#070b15"]} />
+      <fog attach="fog" args={["#070b15", 22, 55]} />
+      <ambientLight intensity={0.4} />
+      <directionalLight position={[8, 12, 6]} intensity={0.7} castShadow />
+      <pointLight position={[0, 8, 0]} intensity={1.1} color="#4ade80" />
+      <Stars radius={90} depth={50} count={3500} factor={3.5} fade speed={1.2} />
       <Grid />
       <WaveGrid />
       <CoreOrb />
@@ -336,11 +337,11 @@ function Scene({
       <OrbitControls
         ref={controlsRef}
         enablePan={false}
-        minDistance={6}
-        maxDistance={28}
+        minDistance={5}
+        maxDistance={32}
         maxPolarAngle={Math.PI / 2.05}
         autoRotate={!selectedNode}
-        autoRotateSpeed={0.5}
+        autoRotateSpeed={0.65}
         enableDamping
         dampingFactor={0.08}
       />
@@ -441,7 +442,7 @@ function Dashboard3D() {
           </div>
 
           <div className="pointer-events-none absolute bottom-3 right-4 font-mono text-[10px] text-muted-foreground">
-            drag to orbit · scroll to zoom
+            drag · scroll · click a node
           </div>
         </motion.div>
 
