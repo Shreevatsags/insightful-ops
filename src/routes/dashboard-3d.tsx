@@ -134,7 +134,7 @@ function WaveGrid() {
   return (
     <mesh ref={ref} rotation={[-Math.PI / 2, 0, 0]} position={[0, -0.5, 0]}>
       <planeGeometry args={[40, 40, 40, 40]} />
-      <meshBasicMaterial color="#1e293b" wireframe transparent opacity={0.5} />
+      <meshBasicMaterial color="#2a3a5c" wireframe transparent opacity={0.55} />
     </mesh>
   );
 }
