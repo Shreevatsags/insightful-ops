@@ -184,10 +184,11 @@ function CoreOrb() {
   const innerRef = useRef<THREE.Mesh>(null!);
   useFrame((s) => {
     const t = s.clock.elapsedTime;
-    groupRef.current.rotation.y = t * 0.3;
+    groupRef.current.rotation.y = t * 0.35;
     groupRef.current.rotation.x = Math.sin(t * 0.4) * 0.2;
+    groupRef.current.position.y = 1.2 + Math.sin(t * 1.2) * 0.15;
     if (innerRef.current) {
-      const pulse = 1 + Math.sin(t * 2) * 0.08;
+      const pulse = 1 + Math.sin(t * 2) * 0.1;
       innerRef.current.scale.setScalar(pulse);
     }
   });
