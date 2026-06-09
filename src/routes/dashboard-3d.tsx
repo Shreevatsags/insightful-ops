@@ -283,6 +283,10 @@ function Scene({
   selectedNode,
   duration,
   easing,
+  showStars,
+  showFog,
+  showPackets,
+  showWaveGrid,
 }: {
   nodes: Node[];
   selectedId: string | null;
@@ -291,6 +295,10 @@ function Scene({
   selectedNode: Node | null;
   duration: number;
   easing: EasingName;
+  showStars: boolean;
+  showFog: boolean;
+  showPackets: boolean;
+  showWaveGrid: boolean;
 }) {
   const packets = useMemo(() => {
     const arr: { from: [number, number, number]; to: [number, number, number]; color: string; speed: number }[] = [];
@@ -311,13 +319,13 @@ function Scene({
   return (
     <>
       <color attach="background" args={["#070b15"]} />
-      <fog attach="fog" args={["#070b15", 22, 55]} />
+      {showFog && <fog attach="fog" args={["#070b15", 22, 55]} />}
       <ambientLight intensity={0.4} />
       <directionalLight position={[8, 12, 6]} intensity={0.7} castShadow />
       <pointLight position={[0, 8, 0]} intensity={1.1} color="#4ade80" />
-      <Stars radius={90} depth={50} count={3500} factor={3.5} fade speed={1.2} />
+      {showStars && <Stars radius={90} depth={50} count={3500} factor={3.5} fade speed={1.2} />}
       <Grid />
-      <WaveGrid />
+      {showWaveGrid && <WaveGrid />}
       <CoreOrb />
       {nodes.map((n, i) => (
         <PulseRing
@@ -327,7 +335,7 @@ function Scene({
           delay={i * 0.18}
         />
       ))}
-      {packets.map((p, i) => (
+      {showPackets && packets.map((p, i) => (
         <DataPacket key={i} from={p.from} to={p.to} color={p.color} speed={p.speed} />
       ))}
       {nodes.map((n) => (
