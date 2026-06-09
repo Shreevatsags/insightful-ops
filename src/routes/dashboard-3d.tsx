@@ -15,6 +15,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Slider } from "@/components/ui/slider";
+import { Switch } from "@/components/ui/switch";
 
 export const Route = createFileRoute("/dashboard-3d")({ component: Dashboard3D });
 
@@ -282,6 +283,10 @@ function Scene({
   selectedNode,
   duration,
   easing,
+  showStars,
+  showFog,
+  showPackets,
+  showWaveGrid,
 }: {
   nodes: Node[];
   selectedId: string | null;
@@ -290,6 +295,10 @@ function Scene({
   selectedNode: Node | null;
   duration: number;
   easing: EasingName;
+  showStars: boolean;
+  showFog: boolean;
+  showPackets: boolean;
+  showWaveGrid: boolean;
 }) {
   const packets = useMemo(() => {
     const arr: { from: [number, number, number]; to: [number, number, number]; color: string; speed: number }[] = [];
@@ -310,13 +319,13 @@ function Scene({
   return (
     <>
       <color attach="background" args={["#070b15"]} />
-      <fog attach="fog" args={["#070b15", 22, 55]} />
+      {showFog && <fog attach="fog" args={["#070b15", 22, 55]} />}
       <ambientLight intensity={0.4} />
       <directionalLight position={[8, 12, 6]} intensity={0.7} castShadow />
       <pointLight position={[0, 8, 0]} intensity={1.1} color="#4ade80" />
-      <Stars radius={90} depth={50} count={3500} factor={3.5} fade speed={1.2} />
+      {showStars && <Stars radius={90} depth={50} count={3500} factor={3.5} fade speed={1.2} />}
       <Grid />
-      <WaveGrid />
+      {showWaveGrid && <WaveGrid />}
       <CoreOrb />
       {nodes.map((n, i) => (
         <PulseRing
@@ -326,7 +335,7 @@ function Scene({
           delay={i * 0.18}
         />
       ))}
-      {packets.map((p, i) => (
+      {showPackets && packets.map((p, i) => (
         <DataPacket key={i} from={p.from} to={p.to} color={p.color} speed={p.speed} />
       ))}
       {nodes.map((n) => (
@@ -376,6 +385,10 @@ function Dashboard3D() {
 
   const [tweenDuration, setTweenDuration] = useState<number>(1.2);
   const [tweenEasing, setTweenEasing] = useState<EasingName>("easeOut");
+  const [showStars, setShowStars] = useState(true);
+  const [showFog, setShowFog] = useState(true);
+  const [showPackets, setShowPackets] = useState(true);
+  const [showWaveGrid, setShowWaveGrid] = useState(true);
 
   const counts = baseNodes.reduce(
     (acc, n) => {
@@ -418,6 +431,10 @@ function Dashboard3D() {
                 duration={tweenDuration}
                 easing={tweenEasing}
                 onSelect={(n) => setSelectedId(n.id)}
+                showStars={showStars}
+                showFog={showFog}
+                showPackets={showPackets}
+                showWaveGrid={showWaveGrid}
               />
             </Suspense>
           </Canvas>
@@ -519,6 +536,27 @@ function Dashboard3D() {
                   </SelectContent>
                 </Select>
               </div>
+            </div>
+          </div>
+
+          <div className="mt-4 border-t border-border pt-4">
+            <p className="font-mono text-[10px] uppercase tracking-wider text-muted-foreground">Scene Effects</p>
+            <div className="mt-3 space-y-2">
+              {[
+                { label: "Stars", state: showStars, set: setShowStars },
+                { label: "Fog", state: showFog, set: setShowFog },
+                { label: "Glow Packets", state: showPackets, set: setShowPackets },
+                { label: "Wave Grid", state: showWaveGrid, set: setShowWaveGrid },
+              ].map(({ label, state, set }) => (
+                <div key={label} className="flex items-center justify-between">
+                  <span className="text-xs text-muted-foreground">{label}</span>
+                  <Switch
+                    checked={state}
+                    onCheckedChange={(v) => set(v)}
+                    className="data-[state=checked]:bg-primary"
+                  />
+                </div>
+              ))}
             </div>
           </div>
 
