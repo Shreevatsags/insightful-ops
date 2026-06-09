@@ -564,20 +564,36 @@ function Dashboard3D() {
                   { label: "Cinematic", stars: true, fog: true, packets: true, wave: true },
                   { label: "Minimal", stars: false, fog: false, packets: false, wave: false },
                   { label: "Dramatic", stars: false, fog: true, packets: true, wave: true },
-                ].map((preset) => (
-                  <button
-                    key={preset.label}
-                    onClick={() => {
-                      setShowStars(preset.stars);
-                      setShowFog(preset.fog);
-                      setShowPackets(preset.packets);
-                      setShowWaveGrid(preset.wave);
-                    }}
-                    className="rounded-md border border-border bg-background px-2 py-0.5 text-[10px] text-muted-foreground transition-colors hover:bg-accent hover:text-accent-foreground"
-                  >
-                    {preset.label}
-                  </button>
-                ))}
+                ].map((preset) => {
+                  const active =
+                    showStars === preset.stars &&
+                    showFog === preset.fog &&
+                    showPackets === preset.packets &&
+                    showWaveGrid === preset.wave;
+                  return (
+                    <button
+                      key={preset.label}
+                      onClick={() => {
+                        setShowStars(preset.stars);
+                        setShowFog(preset.fog);
+                        setShowPackets(preset.packets);
+                        setShowWaveGrid(preset.wave);
+                      }}
+                      className="relative rounded-md border border-border px-2 py-0.5 text-[10px] transition-colors hover:text-accent-foreground"
+                    >
+                      {active && (
+                        <motion.span
+                          layoutId="preset-active"
+                          className="absolute inset-0 rounded-md bg-primary/20 ring-1 ring-primary/40"
+                          transition={{ type: "spring", stiffness: 400, damping: 32 }}
+                        />
+                      )}
+                      <span className={`relative ${active ? "text-foreground" : "text-muted-foreground"}`}>
+                        {preset.label}
+                      </span>
+                    </button>
+                  );
+                })}
               </div>
             </div>
             <div className="mt-3 space-y-2">
@@ -586,15 +602,21 @@ function Dashboard3D() {
                 { label: "Fog", state: showFog, set: setShowFog },
                 { label: "Glow Packets", state: showPackets, set: setShowPackets },
                 { label: "Wave Grid", state: showWaveGrid, set: setShowWaveGrid },
-              ].map(({ label, state, set }) => (
-                <div key={label} className="flex items-center justify-between">
+              ].map(({ label, state, set }, i) => (
+                <motion.div
+                  key={label}
+                  initial={{ opacity: 0, x: 8 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ delay: 0.05 * i, duration: 0.3, ease: [0.22, 1, 0.36, 1] }}
+                  className="flex items-center justify-between"
+                >
                   <span className="text-xs text-muted-foreground">{label}</span>
                   <Switch
                     checked={state}
                     onCheckedChange={(v) => set(v)}
                     className="data-[state=checked]:bg-primary"
                   />
-                </div>
+                </motion.div>
               ))}
             </div>
           </div>
@@ -613,3 +635,4 @@ function Dashboard3D() {
     </div>
   );
 }
+
