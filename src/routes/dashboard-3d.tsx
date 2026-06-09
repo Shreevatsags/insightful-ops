@@ -540,7 +540,29 @@ function Dashboard3D() {
           </div>
 
           <div className="mt-4 border-t border-border pt-4">
-            <p className="font-mono text-[10px] uppercase tracking-wider text-muted-foreground">Scene Effects</p>
+            <div className="flex items-center justify-between">
+              <p className="font-mono text-[10px] uppercase tracking-wider text-muted-foreground">Scene Effects</p>
+              <div className="flex gap-1">
+                {[
+                  { label: "Cinematic", stars: true, fog: true, packets: true, wave: true },
+                  { label: "Minimal", stars: false, fog: false, packets: false, wave: false },
+                  { label: "Dramatic", stars: false, fog: true, packets: true, wave: true },
+                ].map((preset) => (
+                  <button
+                    key={preset.label}
+                    onClick={() => {
+                      setShowStars(preset.stars);
+                      setShowFog(preset.fog);
+                      setShowPackets(preset.packets);
+                      setShowWaveGrid(preset.wave);
+                    }}
+                    className="rounded-md border border-border bg-background px-2 py-0.5 text-[10px] text-muted-foreground transition-colors hover:bg-accent hover:text-accent-foreground"
+                  >
+                    {preset.label}
+                  </button>
+                ))}
+              </div>
+            </div>
             <div className="mt-3 space-y-2">
               {[
                 { label: "Stars", state: showStars, set: setShowStars },
