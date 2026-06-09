@@ -385,6 +385,10 @@ function Dashboard3D() {
 
   const [tweenDuration, setTweenDuration] = useState<number>(1.2);
   const [tweenEasing, setTweenEasing] = useState<EasingName>("easeOut");
+  const [showStars, setShowStars] = useState(true);
+  const [showFog, setShowFog] = useState(true);
+  const [showPackets, setShowPackets] = useState(true);
+  const [showWaveGrid, setShowWaveGrid] = useState(true);
 
   const counts = baseNodes.reduce(
     (acc, n) => {
