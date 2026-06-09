@@ -470,41 +470,58 @@ function Dashboard3D() {
           className="card-gradient flex h-[640px] flex-col rounded-xl border border-border p-5 shadow-[var(--shadow-card)]"
         >
           <h3 className="font-mono text-xs uppercase tracking-wider text-muted-foreground">Inspector</h3>
-          {selected ? (
-            <div className="mt-4 space-y-4">
-              <div>
-                <p className="text-xs text-muted-foreground">Hostname</p>
-                <p className="font-mono text-lg text-foreground">{selected.name}</p>
-              </div>
-              <div className="grid grid-cols-2 gap-3">
+          <AnimatePresence mode="wait">
+            {selected ? (
+              <motion.div
+                key={selected.id ?? selected.name}
+                initial={{ opacity: 0, y: 8, filter: "blur(6px)" }}
+                animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
+                exit={{ opacity: 0, y: -8, filter: "blur(6px)" }}
+                transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
+                className="mt-4 space-y-4"
+              >
                 <div>
-                  <p className="text-xs text-muted-foreground">Region</p>
-                  <p className="font-mono text-sm">{selected.region}</p>
+                  <p className="text-xs text-muted-foreground">Hostname</p>
+                  <p className="font-mono text-lg text-foreground">{selected.name}</p>
+                </div>
+                <div className="grid grid-cols-2 gap-3">
+                  <div>
+                    <p className="text-xs text-muted-foreground">Region</p>
+                    <p className="font-mono text-sm">{selected.region}</p>
+                  </div>
+                  <div>
+                    <p className="text-xs text-muted-foreground">Status</p>
+                    <p className="font-mono text-sm" style={{ color: STATUS_COLOR[selected.status] }}>{selected.status}</p>
+                  </div>
                 </div>
                 <div>
-                  <p className="text-xs text-muted-foreground">Status</p>
-                  <p className="font-mono text-sm" style={{ color: STATUS_COLOR[selected.status] }}>{selected.status}</p>
+                  <p className="text-xs text-muted-foreground">Load</p>
+                  <div className="mt-1 h-2 overflow-hidden rounded-full bg-muted">
+                    <motion.div
+                      className="h-full rounded-full"
+                      initial={{ width: 0 }}
+                      animate={{ width: `${selected.load * 100}%` }}
+                      transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
+                      style={{ background: STATUS_COLOR[selected.status] }}
+                    />
+                  </div>
+                  <p className="mt-1 font-mono text-xs text-muted-foreground">{Math.round(selected.load * 100)}%</p>
                 </div>
-              </div>
-              <div>
-                <p className="text-xs text-muted-foreground">Load</p>
-                <div className="mt-1 h-2 overflow-hidden rounded-full bg-muted">
-                  <div
-                    className="h-full rounded-full transition-all"
-                    style={{
-                      width: `${selected.load * 100}%`,
-                      background: STATUS_COLOR[selected.status],
-                    }}
-                  />
-                </div>
-                <p className="mt-1 font-mono text-xs text-muted-foreground">{Math.round(selected.load * 100)}%</p>
-              </div>
-            </div>
-          ) : (
-            <div className="flex flex-1 items-center justify-center text-center text-xs text-muted-foreground">
-              Select a node in the scene to view details.
-            </div>
-          )}
+              </motion.div>
+            ) : (
+              <motion.div
+                key="empty"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                transition={{ duration: 0.25 }}
+                className="flex flex-1 items-center justify-center text-center text-xs text-muted-foreground"
+              >
+                Select a node in the scene to view details.
+              </motion.div>
+            )}
+          </AnimatePresence>
+
 
           <div className="mt-auto border-t border-border pt-4">
             <p className="font-mono text-[10px] uppercase tracking-wider text-muted-foreground">Camera Tween</p>
