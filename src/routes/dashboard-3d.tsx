@@ -540,6 +540,27 @@ function Dashboard3D() {
           </div>
 
           <div className="mt-4 border-t border-border pt-4">
+            <p className="font-mono text-[10px] uppercase tracking-wider text-muted-foreground">Scene Effects</p>
+            <div className="mt-3 space-y-2">
+              {[
+                { label: "Stars", state: showStars, set: setShowStars },
+                { label: "Fog", state: showFog, set: setShowFog },
+                { label: "Glow Packets", state: showPackets, set: setShowPackets },
+                { label: "Wave Grid", state: showWaveGrid, set: setShowWaveGrid },
+              ].map(({ label, state, set }) => (
+                <div key={label} className="flex items-center justify-between">
+                  <span className="text-xs text-muted-foreground">{label}</span>
+                  <Switch
+                    checked={state}
+                    onCheckedChange={(v) => set(v)}
+                    className="data-[state=checked]:bg-primary"
+                  />
+                </div>
+              ))}
+            </div>
+          </div>
+
+          <div className="mt-4 border-t border-border pt-4">
             <p className="font-mono text-[10px] uppercase tracking-wider text-muted-foreground">Legend</p>
             <div className="mt-2 space-y-1 text-xs">
               <p><span style={{ color: STATUS_COLOR.online }}>■</span> online</p>
