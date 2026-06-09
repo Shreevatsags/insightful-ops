@@ -431,6 +431,10 @@ function Dashboard3D() {
                 duration={tweenDuration}
                 easing={tweenEasing}
                 onSelect={(n) => setSelectedId(n.id)}
+                showStars={showStars}
+                showFog={showFog}
+                showPackets={showPackets}
+                showWaveGrid={showWaveGrid}
               />
             </Suspense>
           </Canvas>
