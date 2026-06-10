@@ -655,11 +655,11 @@ function Dashboard3D() {
             <TooltipProvider delayDuration={200}>
               <div className="mt-3 space-y-3">
                 {[
-                  { label: "Stars", desc: "Background starfield that adds depth to the scene", state: showStars, set: setShowStars },
-                  { label: "Fog", desc: "Atmospheric depth fade that softens distant objects", state: showFog, set: setShowFog },
-                  { label: "Glow Packets", desc: "Animated data-flow particles traveling between nodes", state: showPackets, set: setShowPackets },
-                  { label: "Wave Grid", desc: "Dynamic wireframe ground plane with wave motion", state: showWaveGrid, set: setShowWaveGrid },
-                ].map(({ label, desc, state, set }, i) => (
+                  { label: "Stars", desc: "Background starfield that adds depth to the scene", perf: "Low", state: showStars, set: setShowStars },
+                  { label: "Fog", desc: "Atmospheric depth fade that softens distant objects", perf: "Low", state: showFog, set: setShowFog },
+                  { label: "Glow Packets", desc: "Animated data-flow particles traveling between nodes", perf: "High", state: showPackets, set: setShowPackets },
+                  { label: "Wave Grid", desc: "Dynamic wireframe ground plane with wave motion", perf: "Medium", state: showWaveGrid, set: setShowWaveGrid },
+                ].map(({ label, desc, perf, state, set }, i) => (
                   <motion.div
                     key={label}
                     initial={{ opacity: 0, x: 8 }}
@@ -675,7 +675,16 @@ function Dashboard3D() {
                         </div>
                       </TooltipTrigger>
                       <TooltipContent side="left" sideOffset={8}>
-                        <p className="max-w-[180px]">{desc}</p>
+                        <div className="max-w-[180px]">
+                          <p className="mb-1">{desc}</p>
+                          <span className={`inline-block rounded-full px-1.5 py-0.5 text-[10px] font-medium ${
+                            perf === "Low" ? "bg-emerald-500/10 text-emerald-400" :
+                            perf === "Medium" ? "bg-amber-500/10 text-amber-400" :
+                            "bg-rose-500/10 text-rose-400"
+                          }`}>
+                            {perf} impact
+                          </span>
+                        </div>
                       </TooltipContent>
                     </Tooltip>
                     <Switch
