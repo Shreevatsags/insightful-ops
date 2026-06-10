@@ -16,6 +16,7 @@ import {
 } from "@/components/ui/select";
 import { Slider } from "@/components/ui/slider";
 import { Switch } from "@/components/ui/switch";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 
 export const Route = createFileRoute("/dashboard-3d")({ component: Dashboard3D });
 
@@ -651,29 +652,41 @@ function Dashboard3D() {
                 })}
               </div>
             </div>
-            <div className="mt-3 space-y-2">
-              {[
-                { label: "Stars", state: showStars, set: setShowStars },
-                { label: "Fog", state: showFog, set: setShowFog },
-                { label: "Glow Packets", state: showPackets, set: setShowPackets },
-                { label: "Wave Grid", state: showWaveGrid, set: setShowWaveGrid },
-              ].map(({ label, state, set }, i) => (
-                <motion.div
-                  key={label}
-                  initial={{ opacity: 0, x: 8 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  transition={{ delay: 0.05 * i, duration: 0.3, ease: [0.22, 1, 0.36, 1] }}
-                  className="flex items-center justify-between"
-                >
-                  <span className="text-xs text-muted-foreground">{label}</span>
-                  <Switch
-                    checked={state}
-                    onCheckedChange={(v) => set(v)}
-                    className="data-[state=checked]:bg-primary"
-                  />
-                </motion.div>
-              ))}
-            </div>
+            <TooltipProvider delayDuration={200}>
+              <div className="mt-3 space-y-3">
+                {[
+                  { label: "Stars", desc: "Background starfield that adds depth to the scene", state: showStars, set: setShowStars },
+                  { label: "Fog", desc: "Atmospheric depth fade that softens distant objects", state: showFog, set: setShowFog },
+                  { label: "Glow Packets", desc: "Animated data-flow particles traveling between nodes", state: showPackets, set: setShowPackets },
+                  { label: "Wave Grid", desc: "Dynamic wireframe ground plane with wave motion", state: showWaveGrid, set: setShowWaveGrid },
+                ].map(({ label, desc, state, set }, i) => (
+                  <motion.div
+                    key={label}
+                    initial={{ opacity: 0, x: 8 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ delay: 0.05 * i, duration: 0.3, ease: [0.22, 1, 0.36, 1] }}
+                    className="flex items-center justify-between"
+                  >
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <div className="cursor-help">
+                          <span className="text-xs text-foreground">{label}</span>
+                          <p className="text-[10px] leading-tight text-muted-foreground">{desc}</p>
+                        </div>
+                      </TooltipTrigger>
+                      <TooltipContent side="left" sideOffset={8}>
+                        <p className="max-w-[180px]">{desc}</p>
+                      </TooltipContent>
+                    </Tooltip>
+                    <Switch
+                      checked={state}
+                      onCheckedChange={(v) => set(v)}
+                      className="data-[state=checked]:bg-primary"
+                    />
+                  </motion.div>
+                ))}
+              </div>
+            </TooltipProvider>
           </div>
 
           <div className="mt-4 border-t border-border pt-4">
