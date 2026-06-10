@@ -151,6 +151,22 @@ function AnimatedGroup({ visible, children }: { visible: boolean; children: Reac
   return <group ref={ref}>{children}</group>;
 }
 
+function AnimatedFog({ visible }: { visible: boolean }) {
+  const fogRef = useRef<THREE.Fog>(null!);
+  const progress = useRef(visible ? 1 : 0);
+
+  useFrame(() => {
+    const target = visible ? 1 : 0;
+    progress.current = THREE.MathUtils.lerp(progress.current, target, 0.05);
+    if (fogRef.current) {
+      fogRef.current.near = THREE.MathUtils.lerp(55, 22, progress.current);
+      fogRef.current.far = THREE.MathUtils.lerp(80, 55, progress.current);
+    }
+  });
+
+  return <fog ref={fogRef} attach="fog" args={["#070b15", visible ? 22 : 55, visible ? 55 : 80]} />;
+}
+
 function WaveGrid() {
   const ref = useRef<THREE.Mesh>(null!);
   useFrame((s) => {
