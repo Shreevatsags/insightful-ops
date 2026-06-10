@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { Suspense, useMemo, useRef, useState } from "react";
+import { Suspense, useEffect, useMemo, useRef, useState } from "react";
 import { Canvas, useFrame, useThree } from "@react-three/fiber";
 import { OrbitControls, Stars, Html, Float, Environment } from "@react-three/drei";
 import type { OrbitControls as OrbitControlsImpl } from "three-stdlib";
@@ -118,6 +118,55 @@ function ServerNode({ node, onSelect, selected }: { node: Node; onSelect: (n: No
   );
 }
 
+function AnimatedGroup({ visible, children }: { visible: boolean; children: React.ReactNode }) {
+  const ref = useRef<THREE.Group>(null!);
+  const [rendered, setRendered] = useState(visible);
+
+  useEffect(() => {
+    if (visible) setRendered(true);
+  }, [visible]);
+
+  useFrame(() => {
+    const target = visible ? 1 : 0;
+    ref.current.scale.lerp(new THREE.Vector3(target, target, target), 0.08);
+    ref.current.traverse((obj) => {
+      if (obj instanceof THREE.Mesh && Array.isArray(obj.material)) {
+        obj.material.forEach((m) => {
+          if (m.transparent) {
+            m.opacity = THREE.MathUtils.lerp(m.opacity, target * (obj.userData.baseOpacity ?? 1), 0.08);
+          }
+        });
+      } else if (obj instanceof THREE.Mesh && obj.material instanceof THREE.Material && obj.material.transparent) {
+        (obj.material as THREE.MeshBasicMaterial).opacity = THREE.MathUtils.lerp(
+          (obj.material as THREE.MeshBasicMaterial).opacity,
+          target * (obj.userData.baseOpacity ?? 1),
+          0.08,
+        );
+      }
+    });
+    if (!visible && ref.current.scale.x < 0.01) setRendered(false);
+  });
+
+  if (!rendered) return null;
+  return <group ref={ref}>{children}</group>;
+}
+
+function AnimatedFog({ visible }: { visible: boolean }) {
+  const fogRef = useRef<THREE.Fog>(null!);
+  const progress = useRef(visible ? 1 : 0);
+
+  useFrame(() => {
+    const target = visible ? 1 : 0;
+    progress.current = THREE.MathUtils.lerp(progress.current, target, 0.05);
+    if (fogRef.current) {
+      fogRef.current.near = THREE.MathUtils.lerp(55, 22, progress.current);
+      fogRef.current.far = THREE.MathUtils.lerp(80, 55, progress.current);
+    }
+  });
+
+  return <fog ref={fogRef} attach="fog" args={["#070b15", visible ? 22 : 55, visible ? 55 : 80]} />;
+}
+
 function WaveGrid() {
   const ref = useRef<THREE.Mesh>(null!);
   useFrame((s) => {
@@ -133,9 +182,9 @@ function WaveGrid() {
     pos.needsUpdate = true;
   });
   return (
-    <mesh ref={ref} rotation={[-Math.PI / 2, 0, 0]} position={[0, -0.5, 0]}>
+    <mesh ref={ref} rotation={[-Math.PI / 2, 0, 0]} position={[0, -0.5, 0]} userData={{ baseOpacity: 0.55 }}>
       <planeGeometry args={[40, 40, 40, 40]} />
-      <meshBasicMaterial color="#2a3a5c" wireframe transparent opacity={0.55} />
+      <meshBasicMaterial color="#2a3a5c" wireframe transparent opacity={0} />
     </mesh>
   );
 }
@@ -319,13 +368,17 @@ function Scene({
   return (
     <>
       <color attach="background" args={["#070b15"]} />
-      {showFog && <fog attach="fog" args={["#070b15", 22, 55]} />}
+      <AnimatedFog visible={showFog} />
       <ambientLight intensity={0.4} />
       <directionalLight position={[8, 12, 6]} intensity={0.7} castShadow />
       <pointLight position={[0, 8, 0]} intensity={1.1} color="#4ade80" />
-      {showStars && <Stars radius={90} depth={50} count={3500} factor={3.5} fade speed={1.2} />}
+      <AnimatedGroup visible={showStars}>
+        <Stars radius={90} depth={50} count={3500} factor={3.5} fade speed={1.2} />
+      </AnimatedGroup>
       <Grid />
-      {showWaveGrid && <WaveGrid />}
+      <AnimatedGroup visible={showWaveGrid}>
+        <WaveGrid />
+      </AnimatedGroup>
       <CoreOrb />
       {nodes.map((n, i) => (
         <PulseRing
@@ -335,9 +388,11 @@ function Scene({
           delay={i * 0.18}
         />
       ))}
-      {showPackets && packets.map((p, i) => (
-        <DataPacket key={i} from={p.from} to={p.to} color={p.color} speed={p.speed} />
-      ))}
+      <AnimatedGroup visible={showPackets}>
+        {packets.map((p, i) => (
+          <DataPacket key={i} from={p.from} to={p.to} color={p.color} speed={p.speed} />
+        ))}
+      </AnimatedGroup>
       {nodes.map((n) => (
         <ServerNode key={n.id} node={n} onSelect={onSelect} selected={selectedId === n.id} />
       ))}
