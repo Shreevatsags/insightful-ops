@@ -368,13 +368,17 @@ function Scene({
   return (
     <>
       <color attach="background" args={["#070b15"]} />
-      {showFog && <fog attach="fog" args={["#070b15", 22, 55]} />}
+      <AnimatedFog visible={showFog} />
       <ambientLight intensity={0.4} />
       <directionalLight position={[8, 12, 6]} intensity={0.7} castShadow />
       <pointLight position={[0, 8, 0]} intensity={1.1} color="#4ade80" />
-      {showStars && <Stars radius={90} depth={50} count={3500} factor={3.5} fade speed={1.2} />}
+      <AnimatedGroup visible={showStars}>
+        <Stars radius={90} depth={50} count={3500} factor={3.5} fade speed={1.2} />
+      </AnimatedGroup>
       <Grid />
-      {showWaveGrid && <WaveGrid />}
+      <AnimatedGroup visible={showWaveGrid}>
+        <WaveGrid />
+      </AnimatedGroup>
       <CoreOrb />
       {nodes.map((n, i) => (
         <PulseRing
@@ -384,9 +388,11 @@ function Scene({
           delay={i * 0.18}
         />
       ))}
-      {showPackets && packets.map((p, i) => (
-        <DataPacket key={i} from={p.from} to={p.to} color={p.color} speed={p.speed} />
-      ))}
+      <AnimatedGroup visible={showPackets}>
+        {packets.map((p, i) => (
+          <DataPacket key={i} from={p.from} to={p.to} color={p.color} speed={p.speed} />
+        ))}
+      </AnimatedGroup>
       {nodes.map((n) => (
         <ServerNode key={n.id} node={n} onSelect={onSelect} selected={selectedId === n.id} />
       ))}
