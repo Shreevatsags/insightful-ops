@@ -75,8 +75,17 @@ function RootShell({ children }: { children: React.ReactNode }) {
                   var d=localStorage.getItem('devops-theme');
                   if(d){
                     var p=JSON.parse(d);
-                    if(p.state&&p.state.theme==='light'){
+                    var t=p.state&&p.state.theme;
+                    if(t==='light'){
                       document.documentElement.classList.add('light');
+                      return;
+                    }
+                    if(t==='system'){
+                      if(window.matchMedia('(prefers-color-scheme: dark)').matches){
+                        document.documentElement.classList.add('dark');
+                      } else {
+                        document.documentElement.classList.add('light');
+                      }
                       return;
                     }
                   }
