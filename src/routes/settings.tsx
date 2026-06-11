@@ -5,16 +5,33 @@ import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/store/auth";
+import { useTheme } from "@/store/theme";
+import { Moon, Sun } from "lucide-react";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/settings")({ component: SettingsPage });
 
 function SettingsPage() {
   const { user } = useAuth();
+  const { theme, toggleTheme } = useTheme();
 
   return (
     <div className="p-6 max-w-3xl mx-auto">
       <PageHeader title="settings" description="Workspace, notifications and integrations." />
+
+      <Section title="Appearance">
+        <div className="flex items-center justify-between border-b border-border/50 pb-3 last:border-0 last:pb-0">
+          <div className="flex items-center gap-2">
+            {theme === "dark" ? (
+              <Moon className="h-4 w-4 text-muted-foreground" />
+            ) : (
+              <Sun className="h-4 w-4 text-muted-foreground" />
+            )}
+            <span className="text-sm">Dark mode</span>
+          </div>
+          <Switch checked={theme === "dark"} onCheckedChange={toggleTheme} />
+        </div>
+      </Section>
 
       <Section title="Profile">
         <Field label="Name"><Input defaultValue={user?.name} /></Field>
