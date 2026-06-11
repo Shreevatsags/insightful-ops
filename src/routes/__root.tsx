@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import {
   Outlet, Link, createRootRouteWithContext, useRouter, useRouterState,
@@ -7,6 +8,7 @@ import appCss from "../styles.css?url";
 import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 import { AppSidebar } from "@/components/AppSidebar";
 import { useAuth } from "@/store/auth";
+import { useTheme } from "@/store/theme";
 import { Toaster } from "@/components/ui/sonner";
 
 function NotFoundComponent() {
@@ -63,17 +65,48 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
 
 function RootShell({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" className="dark">
-      <head><HeadContent /></head>
+    <html lang="en">
+      <head>
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `
+              (function(){
+                try{
+                  var d=localStorage.getItem('devops-theme');
+                  if(d){
+                    var p=JSON.parse(d);
+                    if(p.state&&p.state.theme==='light'){
+                      document.documentElement.classList.add('light');
+                      return;
+                    }
+                  }
+                }catch(e){}
+                document.documentElement.classList.add('dark');
+              })();
+            `,
+          }}
+        />
+        <HeadContent />
+      </head>
       <body>{children}<Scripts /></body>
     </html>
   );
+}
+
+function ThemeSync() {
+  const theme = useTheme((s) => s.theme);
+  useEffect(() => {
+    document.documentElement.classList.remove("dark", "light");
+    document.documentElement.classList.add(theme);
+  }, [theme]);
+  return null;
 }
 
 function RootComponent() {
   const { queryClient } = Route.useRouteContext();
   return (
     <QueryClientProvider client={queryClient}>
+      <ThemeSync />
       <Shell />
       <Toaster />
     </QueryClientProvider>

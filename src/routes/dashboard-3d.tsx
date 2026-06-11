@@ -696,6 +696,21 @@ function Dashboard3D() {
                 ))}
               </div>
             </TooltipProvider>
+            <div className="mt-3 flex flex-wrap items-center gap-x-3 gap-y-1.5 rounded-md border border-border/40 bg-muted/20 px-2.5 py-2">
+              <span className="text-[10px] font-medium text-muted-foreground">Impact:</span>
+              <span className="inline-flex items-center gap-1 text-[10px] text-muted-foreground">
+                <span className="rounded-full bg-emerald-500/10 px-1.5 py-0.5 font-medium text-emerald-400">Low</span>
+                Minimal GPU / negligible FPS
+              </span>
+              <span className="inline-flex items-center gap-1 text-[10px] text-muted-foreground">
+                <span className="rounded-full bg-amber-500/10 px-1.5 py-0.5 font-medium text-amber-400">Medium</span>
+                Moderate GPU / slight FPS dip
+              </span>
+              <span className="inline-flex items-center gap-1 text-[10px] text-muted-foreground">
+                <span className="rounded-full bg-rose-500/10 px-1.5 py-0.5 font-medium text-rose-400">High</span>
+                Heavy GPU / noticeable FPS drop
+              </span>
+            </div>
           </div>
 
           <div className="mt-4 border-t border-border pt-4">
