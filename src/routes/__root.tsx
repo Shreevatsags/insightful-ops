@@ -95,10 +95,27 @@ function RootShell({ children }: { children: React.ReactNode }) {
 
 function ThemeSync() {
   const theme = useTheme((s) => s.theme);
+  const resolved = useTheme((s) => s.resolvedTheme)();
+
   useEffect(() => {
-    document.documentElement.classList.remove("dark", "light");
-    document.documentElement.classList.add(theme);
+    const apply = () => {
+      const r = useTheme.getState().resolvedTheme();
+      document.documentElement.classList.remove("dark", "light");
+      document.documentElement.classList.add(r);
+    };
+
+    if (theme === "system") {
+      const mq = window.matchMedia("(prefers-color-scheme: dark)");
+      apply();
+      const listener = () => apply();
+      mq.addEventListener("change", listener);
+      return () => mq.removeEventListener("change", listener);
+    } else {
+      document.documentElement.classList.remove("dark", "light");
+      document.documentElement.classList.add(theme);
+    }
   }, [theme]);
+
   return null;
 }
 

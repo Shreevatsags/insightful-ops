@@ -5,15 +5,21 @@ import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/store/auth";
-import { useTheme } from "@/store/theme";
-import { Moon, Sun } from "lucide-react";
+import { useTheme, type Theme } from "@/store/theme";
+import { Moon, Sun, Monitor } from "lucide-react";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/settings")({ component: SettingsPage });
 
+const options: { value: Theme; label: string; icon: React.ReactNode }[] = [
+  { value: "light", label: "Light", icon: <Sun className="h-4 w-4" /> },
+  { value: "dark", label: "Dark", icon: <Moon className="h-4 w-4" /> },
+  { value: "system", label: "System", icon: <Monitor className="h-4 w-4" /> },
+];
+
 function SettingsPage() {
   const { user } = useAuth();
-  const { theme, toggleTheme } = useTheme();
+  const { theme, setTheme } = useTheme();
 
   return (
     <div className="p-6 max-w-3xl mx-auto">
@@ -22,14 +28,24 @@ function SettingsPage() {
       <Section title="Appearance">
         <div className="flex items-center justify-between border-b border-border/50 pb-3 last:border-0 last:pb-0">
           <div className="flex items-center gap-2">
-            {theme === "dark" ? (
-              <Moon className="h-4 w-4 text-muted-foreground" />
-            ) : (
-              <Sun className="h-4 w-4 text-muted-foreground" />
-            )}
-            <span className="text-sm">Dark mode</span>
+            <span className="text-sm">Theme</span>
           </div>
-          <Switch checked={theme === "dark"} onCheckedChange={toggleTheme} />
+          <div className="inline-flex rounded-lg border border-border bg-muted/40 p-0.5">
+            {options.map((opt) => (
+              <button
+                key={opt.value}
+                onClick={() => setTheme(opt.value)}
+                className={`flex items-center gap-1.5 rounded-md px-2.5 py-1 text-xs font-medium transition-colors ${
+                  theme === opt.value
+                    ? "bg-card text-foreground shadow-sm"
+                    : "text-muted-foreground hover:text-foreground"
+                }`}
+              >
+                {opt.icon}
+                {opt.label}
+              </button>
+            ))}
+          </div>
         </div>
       </Section>
 
