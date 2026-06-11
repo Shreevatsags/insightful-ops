@@ -1,12 +1,21 @@
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
 
-type Theme = "light" | "dark";
+export type Theme = "light" | "dark" | "system";
+
+function getSystemTheme(): "light" | "dark" {
+  if (typeof window !== "undefined") {
+    return window.matchMedia("(prefers-color-scheme: dark)").matches
+      ? "dark"
+      : "light";
+  }
+  return "dark";
+}
 
 interface ThemeState {
   theme: Theme;
   setTheme: (theme: Theme) => void;
-  toggleTheme: () => void;
+  resolvedTheme: () => "light" | "dark";
 }
 
 export const useTheme = create<ThemeState>()(
@@ -14,8 +23,10 @@ export const useTheme = create<ThemeState>()(
     (set, get) => ({
       theme: "dark",
       setTheme: (theme) => set({ theme }),
-      toggleTheme: () =>
-        set({ theme: get().theme === "dark" ? "light" : "dark" }),
+      resolvedTheme: () => {
+        const t = get().theme;
+        return t === "system" ? getSystemTheme() : t;
+      },
     }),
     { name: "devops-theme" },
   ),
