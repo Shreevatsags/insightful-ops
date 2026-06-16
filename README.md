@@ -150,18 +150,6 @@ npm run build
 
 ---
 
-## Deployment
-
-Deployment is currently in progress.
-
-Planned deployment platforms:
-
-* Vercel
-* Netlify
-* Render
-
----
-
 ## Roadmap
 
 * [ ] Production deployment
