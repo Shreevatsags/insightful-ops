@@ -188,11 +188,6 @@ git push origin feature/new-feature
 
 ---
 
-## License
-
-MIT License
-
----
 
 ## Author
 
