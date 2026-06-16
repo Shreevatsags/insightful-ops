@@ -1,85 +1,103 @@
-# Insightful Ops 🚀
+# Insightful Ops 📊
 
-A modern operations intelligence platform that helps teams monitor, analyze, and manage operational data through interactive dashboards and actionable insights.
-
-## ✨ Features
-
-- 📊 Real-time operational dashboards
-- 📈 Analytics and reporting
-- 🔐 Authentication and user management
-- ☁️ Supabase backend integration
-- ⚡ Fast frontend built with React + TypeScript
-- 🎨 Modern responsive UI
-- 📱 Mobile-friendly design
+A modern operational intelligence platform designed to help teams monitor, analyze, and manage operational workflows through data-driven insights and interactive dashboards.
 
 ---
 
-## 🛠 Tech Stack
+## Overview
+
+Insightful Ops provides a centralized interface for tracking operational metrics, identifying trends, and improving decision-making through visual analytics.
+
+The platform is built with modern web technologies and leverages Supabase for backend services including authentication, database management, and real-time capabilities.
+
+---
+
+## Features
+
+* 📈 Interactive dashboards
+* 📊 Operational analytics and reporting
+* 🔍 Data visualization and insights
+* 🔐 Secure authentication
+* ⚡ Real-time data updates
+* 📱 Responsive user interface
+* ☁️ Supabase integration
+
+---
+
+## Tech Stack
 
 ### Frontend
-- React
-- TypeScript
-- Vite
-- Tailwind CSS
-- Shadcn UI
+
+* React
+* TypeScript
+* Vite
+* Tailwind CSS
+* Shadcn UI
 
 ### Backend
-- Supabase
-  - Authentication
-  - Database
-  - Storage
-  - Edge Functions
+
+* Supabase
+
+  * Authentication
+  * PostgreSQL Database
+  * Storage
+  * Realtime Services
 
 ### Development Tools
-- Bun
-- ESLint
-- Prettier
+
+* Bun
+* ESLint
+* Prettier
 
 ---
 
-## 📂 Project Structure
+## Project Structure
 
-```bash
+```text
 insightful-ops/
+├── src/
+│   ├── components/
+│   ├── pages/
+│   ├── hooks/
+│   ├── services/
+│   └── utils/
 │
-├── src/                 # Application source code
-├── supabase/            # Supabase configuration and migrations
-├── .lovable/            # Lovable project files
-├── public/              # Static assets
-├── .env                 # Environment variables
+├── supabase/
+│   ├── migrations/
+│   └── functions/
+│
+├── public/
+├── .env
 ├── package.json
-├── bun.lock
 └── README.md
 ```
 
 ---
 
-## 🚀 Getting Started
+## Getting Started
 
 ### Prerequisites
 
-Make sure you have installed:
+Install:
 
-- Node.js 18+
-- Bun
-- Git
+* Node.js (v18 or later)
+* Bun
+* Git
 
 ### Clone Repository
 
 ```bash
-git clone https://github.com/your-username/insightful-ops.git
+git clone https://github.com/Shreevatsags/insightful-ops.git
 cd insightful-ops
 ```
 
 ### Install Dependencies
 
-Using Bun:
-
 ```bash
 bun install
 ```
 
-Or using npm:
+or
 
 ```bash
 npm install
@@ -87,7 +105,7 @@ npm install
 
 ---
 
-## ⚙️ Environment Setup
+## Environment Variables
 
 Create a `.env` file in the project root:
 
@@ -98,7 +116,7 @@ VITE_SUPABASE_ANON_KEY=your_supabase_anon_key
 
 ---
 
-## ▶️ Run Locally
+## Run Locally
 
 ```bash
 bun run dev
@@ -110,28 +128,15 @@ or
 npm run dev
 ```
 
-Application will start at:
+The application will be available at:
 
-```bash
+```text
 http://localhost:5173
 ```
 
 ---
 
-## 🗄️ Supabase Setup
-
-1. Create a Supabase project.
-2. Copy the project URL and anon key.
-3. Add them to the `.env` file.
-4. Run migrations if available:
-
-```bash
-supabase db push
-```
-
----
-
-## 📦 Build for Production
+## Build for Production
 
 ```bash
 bun run build
@@ -145,40 +150,32 @@ npm run build
 
 ---
 
-## 🧪 Linting
+## Deployment
 
-```bash
-bun run lint
-```
+Deployment is currently in progress.
 
----
+Planned deployment platforms:
 
-## 🚀 Deployment
-
-You can deploy the application on:
-
-- Vercel
-- Netlify
-- AWS
-- Render
-
-For Vercel:
-
-```bash
-vercel deploy
-```
+* Vercel
+* Netlify
+* Render
 
 ---
 
-## 🔒 Security
+## Roadmap
 
-- Store secrets in environment variables.
-- Never commit `.env` files.
-- Enable Row Level Security (RLS) in Supabase.
+* [ ] Production deployment
+* [ ] Advanced analytics dashboard
+* [ ] Export reports
+* [ ] Role-based access control
+* [ ] Notification system
+* [ ] Performance monitoring
 
 ---
 
-## 🤝 Contributing
+## Contributing
+
+Contributions are welcome.
 
 1. Fork the repository
 2. Create a feature branch
@@ -193,7 +190,7 @@ git checkout -b feature/new-feature
 git commit -m "Add new feature"
 ```
 
-4. Push branch
+4. Push to GitHub
 
 ```bash
 git push origin feature/new-feature
@@ -203,14 +200,14 @@ git push origin feature/new-feature
 
 ---
 
-## 📄 License
+## License
 
-This project is licensed under the MIT License.
+MIT License
 
 ---
 
-## 👨‍💻 Author
+## Author
 
-**Shreevatsags**
+**Shreevatsa S**
 
-Built with ❤️ using React, TypeScript, Supabase, and Bun.
+GitHub: https://github.com/Shreevatsags
